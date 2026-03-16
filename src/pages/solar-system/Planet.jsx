@@ -1,5 +1,4 @@
-import { useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useMemo } from 'react'
 import { Html } from '@react-three/drei'
 import { getScaledValues, getOrbitalPosition } from './orbitalData.js'
 import OrbitLine from './OrbitLine.jsx'
@@ -7,8 +6,6 @@ import Moon from './Moon.jsx'
 import EarthMarker from './EarthMarker.jsx'
 
 export default function Planet({ planet, scaleMode, simTime, showLabel, showMoonLabels, showObserver, activeTopic }) {
-  const meshRef = useRef()
-
   const { orbitalRadius, radius } = useMemo(
     () => getScaledValues(planet, scaleMode),
     [planet, scaleMode]
@@ -18,15 +15,6 @@ export default function Planet({ planet, scaleMode, simTime, showLabel, showMoon
     () => getOrbitalPosition(orbitalRadius, planet.orbitalPeriodDays, simTime),
     [orbitalRadius, planet.orbitalPeriodDays, simTime]
   )
-
-  // Rotation
-  useFrame((_, delta) => {
-    if (meshRef.current && planet.rotationPeriodHours !== 0) {
-      // rotation per frame: delta seconds * (360 / rotationPeriod_in_seconds)
-      // But we're in sim time, not real time. The rotation is tied to simTime.
-      // We'll handle rotation via simTime directly in the render.
-    }
-  })
 
   const rotationAngle = useMemo(() => {
     if (planet.rotationPeriodHours === 0) return 0
@@ -47,7 +35,7 @@ export default function Planet({ planet, scaleMode, simTime, showLabel, showMoon
         {/* Axial tilt */}
         <group rotation={[0, 0, axialTiltRad]}>
           {/* Rotating body */}
-          <mesh ref={meshRef} rotation={[0, rotationAngle, 0]}>
+          <mesh rotation={[0, rotationAngle, 0]}>
             <sphereGeometry args={[radius, 32, 32]} />
             <meshStandardMaterial color={planet.color} roughness={0.7} />
 

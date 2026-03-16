@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Stars } from '@react-three/drei'
-import * as THREE from 'three'
 import Sun from './Sun.jsx'
 import Planet from './Planet.jsx'
 import CameraController from './CameraController.jsx'
@@ -61,18 +60,22 @@ function SolarSystemScene({ simTime, scaleMode, activeTopic, tick }) {
 function SunEarthLine({ simTime, scaleMode }) {
   const earth = PLANETS.find((p) => p.name === 'Earth')
 
-  const points = useMemo(() => {
+  const positions = useMemo(() => {
     const { orbitalRadius } = getScaledValues(earth, scaleMode)
     const [ex, ey, ez] = getOrbitalPosition(orbitalRadius, earth.orbitalPeriodDays, simTime)
-    return [new THREE.Vector3(0, 0, 0), new THREE.Vector3(ex, ey, ez)]
+    return new Float32Array([0, 0, 0, ex, ey, ez])
   }, [earth, scaleMode, simTime])
 
-  const geometry = useMemo(() => {
-    return new THREE.BufferGeometry().setFromPoints(points)
-  }, [points])
-
   return (
-    <line geometry={geometry}>
+    <line>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={2}
+          itemSize={3}
+        />
+      </bufferGeometry>
       <lineBasicMaterial color="#FDB813" transparent opacity={0.3} />
     </line>
   )

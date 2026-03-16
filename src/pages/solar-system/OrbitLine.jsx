@@ -1,24 +1,29 @@
 import { useMemo } from 'react'
-import * as THREE from 'three'
 
 export default function OrbitLine({ radius, color = '#ffffff', opacity = 0.15 }) {
-  const points = useMemo(() => {
-    const pts = []
+  const positions = useMemo(() => {
     const segments = 128
+    const arr = new Float32Array((segments + 1) * 3)
     for (let i = 0; i <= segments; i++) {
       const angle = (i / segments) * Math.PI * 2
-      pts.push(new THREE.Vector3(radius * Math.cos(angle), 0, radius * Math.sin(angle)))
+      arr[i * 3]     = radius * Math.cos(angle)
+      arr[i * 3 + 1] = 0
+      arr[i * 3 + 2] = radius * Math.sin(angle)
     }
-    return pts
+    return arr
   }, [radius])
 
-  const geometry = useMemo(() => {
-    return new THREE.BufferGeometry().setFromPoints(points)
-  }, [points])
-
   return (
-    <line geometry={geometry}>
-      <lineBasicMaterial color={color} transparent opacity={opacity} />
-    </line>
+    <lineLoop>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          array={positions}
+          count={positions.length / 3}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial color={color} transparent opacity={opacity} depthWrite={false} />
+    </lineLoop>
   )
 }
