@@ -89,7 +89,7 @@ export default function Scene({ simTime, scaleMode, activeTopic, tick }) {
   return (
     <Canvas
       camera={{ position: [0, 200, 300], fov: 50, near: 0.01, far: 10000 }}
-      style={{ background: '#000010' }}
+      style={{ background: '#000010', touchAction: 'none' }}
     >
       <CameraController
         targetPosition={topic ? cameraPos : null}
