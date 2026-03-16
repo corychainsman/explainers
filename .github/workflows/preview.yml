@@ -1,0 +1,22 @@
+name: Preview Deploy
+
+on:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: VITE_BASE=/ bun run build
+      - name: Deploy to Surge
+        run: |
+          npm install -g surge
+          BRANCH_SLUG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]' | cut -c1-40)
+          DEPLOY_URL="explainers-${BRANCH_SLUG}.surge.sh"
+          surge ./dist "$DEPLOY_URL" --token "${{ secrets.SURGE_TOKEN }}"
+          echo "## Preview deployed!" >> $GITHUB_STEP_SUMMARY
+          echo "URL: https://${DEPLOY_URL}" >> $GITHUB_STEP_SUMMARY
