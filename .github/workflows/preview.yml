@@ -13,10 +13,13 @@ jobs:
       - run: bun install
       - run: VITE_BASE=/ bun run build
       - name: Deploy to Surge
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
         run: |
-          npm install -g surge
+          npx surge --version
           BRANCH_SLUG=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9]/-/g' | tr '[:upper:]' '[:lower:]' | cut -c1-40)
           DEPLOY_URL="explainers-${BRANCH_SLUG}.surge.sh"
-          surge ./dist "$DEPLOY_URL" --token "${{ secrets.SURGE_TOKEN }}"
+          echo "Deploying to: $DEPLOY_URL"
+          npx surge ./dist "$DEPLOY_URL"
           echo "## Preview deployed!" >> $GITHUB_STEP_SUMMARY
           echo "URL: https://${DEPLOY_URL}" >> $GITHUB_STEP_SUMMARY
