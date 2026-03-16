@@ -4,9 +4,9 @@ import './Home.css'
 const pages = [
   {
     id: 1,
-    title: 'Page One',
-    description: 'Coming soon',
-    path: '/page-one',
+    title: 'Solar System',
+    description: 'Explore how Earth\'s orbit creates days, years, moon phases, and eclipses',
+    path: '/solar-system',
   },
   {
     id: 2,
