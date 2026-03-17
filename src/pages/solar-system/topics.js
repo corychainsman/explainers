@@ -4,8 +4,10 @@ export const TOPICS = [
     title: "Earth's Solar Day",
     menuLabel: 'Solar Day',
     scaleMode: 'notToScale',
-    speed: 500,
-    camera: { position: [12, 5, 15], target: [8, 0, 0] }, // looking at Earth from the side
+    speed: 0.2, // 1 day in ~5 real seconds
+    loopDays: 2, // loop every 2 days
+    followPlanet: 'Earth',
+    camera: { offset: [5, 3, 5] }, // relative to Earth
     focusPlanet: 'Earth',
     description: `A "day" is one rotation of Earth relative to the Sun — not relative to the distant stars. This takes about 24 hours.
 
@@ -23,8 +25,10 @@ Watch Earth spin and notice how the line from Earth to the Sun slowly shifts as 
     title: "Earth's Solar Year",
     menuLabel: 'Solar Year',
     scaleMode: 'notToScale',
-    speed: 3000,
-    camera: { position: [0, 50, 0], target: [0, 0, 0] }, // top-down
+    speed: 12, // 1 year in ~30 real seconds
+    loopDays: 365.25,
+    followPlanet: null, // top-down fixed view
+    camera: { position: [0, 70, 10], target: [0, 0, 0] },
     focusPlanet: 'Earth',
     description: `A year is one complete orbit of Earth around the Sun — about 365.25 days. That extra quarter-day is why we add a leap day every four years.
 
@@ -42,8 +46,10 @@ Watch Earth trace its full orbit. The tilt direction stays fixed in space (point
     title: 'Moon Phases',
     menuLabel: 'Moon Phases',
     scaleMode: 'notToScale',
-    speed: 1000,
-    camera: { position: [8, 20, 8], target: [8, 0, 0] }, // above Earth-Moon system
+    speed: 2.5, // 1 lunar month (~29.5 days) in ~12 real seconds
+    loopDays: 29.5,
+    followPlanet: 'Earth',
+    camera: { offset: [0, 10, 8] }, // above Earth-Moon
     focusPlanet: 'Earth',
     description: `The Moon orbits Earth every ~27.3 days. Half of the Moon is always lit by the Sun — but how much of that lit side we see from Earth changes as the Moon moves.
 
@@ -63,7 +69,9 @@ Watch the Moon orbit and notice how the angle between the Sun and Moon (as seen 
     menuLabel: 'Eclipses',
     scaleMode: 'notToScale',
     speed: 0, // paused by default, user scrubs
-    camera: { position: [12, 3, 0], target: [8, 0, 0] }, // side view of alignment
+    loopDays: null,
+    followPlanet: 'Earth',
+    camera: { offset: [8, 2, 0] }, // side view of alignment
     focusPlanet: 'Earth',
     description: `A solar eclipse happens when the Moon passes directly between the Sun and Earth, casting a shadow on Earth. A lunar eclipse happens when Earth is directly between the Sun and Moon, casting its shadow on the Moon.
 
@@ -82,8 +90,10 @@ Use the timeline scrubber to find the alignment. Notice how the Moon's tilted or
     title: 'Sunrises & Sunsets',
     menuLabel: 'Sunrise/Sunset',
     scaleMode: 'notToScale',
-    speed: 500,
-    camera: { position: [10, 2, 4], target: [8, 0, 0] }, // close to Earth, slightly above
+    speed: 0.2, // 1 day in ~5 real seconds
+    loopDays: 2,
+    followPlanet: 'Earth',
+    camera: { offset: [3, 1, 3] }, // very close, low angle
     focusPlanet: 'Earth',
     description: `As Earth rotates, every point on its surface sweeps through the sunlit and dark hemispheres. When your location rotates from the dark side into sunlight, you see a sunrise. When you rotate out of sunlight, it's sunset.
 
@@ -101,7 +111,9 @@ Watch the observer marker on Earth's surface. As Earth rotates, the marker moves
     title: 'The Whole Orrery',
     menuLabel: 'Full System',
     scaleMode: 'toScale',
-    speed: 5000,
+    speed: 9, // Mercury orbit (~88 days) in ~10 seconds
+    loopDays: null,
+    followPlanet: null,
     camera: { position: [0, 200, 300], target: [0, 0, 0] },
     focusPlanet: null,
     description: `This is the full solar system in motion, shown at approximately correct proportional distances.

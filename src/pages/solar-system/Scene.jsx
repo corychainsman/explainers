@@ -20,7 +20,6 @@ function SolarSystemScene({ simTime, scaleMode, activeTopic, tick }) {
   const sunRadius = getSunScaledRadius(scaleMode)
 
   const showAllLabels = !topic || topic.id === 'whole-orrery'
-  const focusEarth = topic && ['solar-day', 'solar-year', 'moon-phases', 'eclipses', 'sunrise-sunset'].includes(topic.id)
   const showObserver = topic && ['sunrise-sunset', 'solar-day'].includes(topic.id)
 
   return (
@@ -83,8 +82,23 @@ function SunEarthLine({ simTime, scaleMode }) {
 
 export default function Scene({ simTime, scaleMode, activeTopic, tick }) {
   const topic = activeTopic ? getTopicById(activeTopic) : null
-  const cameraPos = topic?.camera?.position || [0, 200, 300]
-  const cameraTarget = topic?.camera?.target || [0, 0, 0]
+
+  // Compute follow target for Earth-focused topics
+  const followTarget = useMemo(() => {
+    if (!topic?.followPlanet) return null
+    const planet = PLANETS.find((p) => p.name === topic.followPlanet)
+    if (!planet) return null
+    const { orbitalRadius } = getScaledValues(planet, scaleMode)
+    const position = getOrbitalPosition(orbitalRadius, planet.orbitalPeriodDays, simTime)
+    return {
+      position,
+      offset: topic.camera.offset,
+    }
+  }, [topic, scaleMode, simTime])
+
+  // Fixed camera for non-following topics
+  const fixedPosition = (!topic?.followPlanet && topic?.camera?.position) || null
+  const fixedTarget = (!topic?.followPlanet && topic?.camera?.target) || null
 
   return (
     <Canvas
@@ -92,8 +106,9 @@ export default function Scene({ simTime, scaleMode, activeTopic, tick }) {
       style={{ background: '#000010', touchAction: 'none' }}
     >
       <CameraController
-        targetPosition={topic ? cameraPos : null}
-        targetLookAt={topic ? cameraTarget : null}
+        targetPosition={topic && !topic.followPlanet ? fixedPosition : null}
+        targetLookAt={topic && !topic.followPlanet ? fixedTarget : null}
+        followTarget={followTarget}
       />
       <SolarSystemScene
         simTime={simTime}
