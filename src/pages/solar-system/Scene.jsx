@@ -109,6 +109,7 @@ export default function Scene({ simTime, scaleMode, activeTopic, tick }) {
         targetPosition={topic && !topic.followPlanet ? fixedPosition : null}
         targetLookAt={topic && !topic.followPlanet ? fixedTarget : null}
         followTarget={followTarget}
+        activeTopic={activeTopic}
       />
       <SolarSystemScene
         simTime={simTime}

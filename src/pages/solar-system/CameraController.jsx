@@ -3,7 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 
-export default function CameraController({ targetPosition, targetLookAt, followTarget }) {
+export default function CameraController({ targetPosition, targetLookAt, followTarget, activeTopic }) {
   const controlsRef = useRef()
   const { camera } = useThree()
   const isAnimating = useRef(false)
@@ -13,17 +13,16 @@ export default function CameraController({ targetPosition, targetLookAt, followT
   const endPos = useRef(new THREE.Vector3())
   const endTarget = useRef(new THREE.Vector3())
 
-  // Camera offset from follow target (set when topic with followPlanet activates)
-  const cameraOffset = useRef(null)
   const isFollowing = useRef(false)
+  const followOffset = useRef(null)
   const prevFollowPos = useRef(new THREE.Vector3())
 
+  // Only trigger animation when the topic changes, not every frame
   useEffect(() => {
     if (followTarget) {
-      // followTarget = { position: [x,y,z], offset: [ox,oy,oz] }
       const planetPos = new THREE.Vector3(...followTarget.position)
       const offset = new THREE.Vector3(...followTarget.offset)
-      cameraOffset.current = offset.clone()
+      followOffset.current = offset.clone()
       isFollowing.current = true
       prevFollowPos.current.copy(planetPos)
 
@@ -38,7 +37,7 @@ export default function CameraController({ targetPosition, targetLookAt, followT
       isAnimating.current = true
     } else if (targetPosition && targetLookAt) {
       isFollowing.current = false
-      cameraOffset.current = null
+      followOffset.current = null
 
       startPos.current.copy(camera.position)
       if (controlsRef.current) {
@@ -50,14 +49,15 @@ export default function CameraController({ targetPosition, targetLookAt, followT
       isAnimating.current = true
     } else {
       isFollowing.current = false
-      cameraOffset.current = null
+      followOffset.current = null
     }
-  }, [followTarget, targetPosition, targetLookAt, camera])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTopic]) // Only re-run when the topic changes
 
   useFrame((_, delta) => {
     // Handle animation (initial transition)
     if (isAnimating.current && animProgress.current < 1) {
-      animProgress.current = Math.min(1, animProgress.current + delta * 2) // ~0.5s
+      animProgress.current = Math.min(1, animProgress.current + delta * 4) // fast ~0.25s
       const t = easeInOutCubic(animProgress.current)
 
       camera.position.lerpVectors(startPos.current, endPos.current, t)
@@ -74,12 +74,11 @@ export default function CameraController({ targetPosition, targetLookAt, followT
     }
 
     // Handle following a planet (after animation completes)
-    if (isFollowing.current && followTarget && cameraOffset.current) {
+    if (isFollowing.current && followTarget && followOffset.current) {
       const planetPos = new THREE.Vector3(...followTarget.position)
       const movement = planetPos.clone().sub(prevFollowPos.current)
       prevFollowPos.current.copy(planetPos)
 
-      // Move camera and target by the planet's movement delta
       camera.position.add(movement)
       if (controlsRef.current) {
         controlsRef.current.target.add(movement)
